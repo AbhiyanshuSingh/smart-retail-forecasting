@@ -13,6 +13,39 @@ def load_data():
     return calendar, sales, prices
 
 
+def preprocess_input(raw_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Takes raw input from FastAPI and applies the exact same preprocessing
+    as was done during training, so the number and order of features match.
+    """
+
+    # Example: These steps should match your training steps
+    # 1. Convert date to datetime
+    raw_df["date"] = pd.to_datetime(raw_df["date"])
+
+    # 2. Extract date parts (must match training exactly)
+    raw_df["year"] = raw_df["date"].dt.year
+    raw_df["month"] = raw_df["date"].dt.month
+    raw_df["day"] = raw_df["date"].dt.day
+
+    # 3. Encode categoricals (must match training order and encoding)
+    categorical_cols = ["store_id", "item_id"]
+    for col in categorical_cols:
+        raw_df[col] = raw_df[col].astype("category").cat.codes
+
+    # 4. Drop original date column if model didn’t use it
+    raw_df = raw_df.drop(columns=["date"])
+
+    # 5. Ensure column order matches training
+    # (Get your training column list from train_model.py)
+    expected_columns = [
+        "store_id", "item_id", "year", "month", "day"
+        # plus all other features used in training
+    ]
+    raw_df = raw_df[expected_columns]
+
+    return raw_df
+
 def melt_sales(sales):
     # Convert from wide to long format
     id_vars = sales.columns[:6]

@@ -6,6 +6,7 @@ from sklearn.metrics import mean_squared_error
 from joblib import dump
 from pathlib import Path
 import numpy as np
+import json
 
 PROCESSED_PATH = Path("data/processed")
 MODELS_PATH = Path("models")
@@ -63,11 +64,26 @@ if __name__ == "__main__":
     print("Preparing features...")
     X, y = prepare_features(df)
 
+    # --- Save training feature list for later comparison ---
+    FEATURE_COLS_PATH = "models/feature_columns.json"
+    feature_cols = X.columns.tolist()
+    with open(FEATURE_COLS_PATH, "w", encoding="utf-8") as f:
+        json.dump(feature_cols, f, indent=2)
+    print(f"Saved training feature columns to {FEATURE_COLS_PATH}")
+
+
     print("Splitting data...")
     X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.2, random_state=42)
+    # --- Save validation set for later evaluation ---
+    print("Saving validation data for evaluation...")
+    X_valid.to_parquet("data/processed/X_valid.parquet")
+    pd.DataFrame({"sales": y_valid}).to_parquet("data/processed/y_valid.parquet")
+
 
     print("Training model...")
     model = train_baseline(X_train, y_train, X_valid, y_valid)
+    
+
 
     print("Evaluating model...")
     y_pred = model.predict(X_valid)
