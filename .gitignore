@@ -1,0 +1,13 @@
+# Virtual env
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Data
+data/raw/
+data/interim/
+data/processed/
+
+# Secrets
+.env
