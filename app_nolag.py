@@ -22,7 +22,11 @@ sell_prices = pd.read_csv(DATA_RAW / "sell_prices.csv")  # has store_id,item_id,
 # create item->meta lookup from original processed dataset if needed
 # we assume train_features.parquet has columns item_id, dept_id, cat_id, state_id
 meta = pd.read_parquet("data/processed/train_features.parquet")[["item_id","dept_id","cat_id","store_id","state_id"]].drop_duplicates()
+
+meta = meta.drop_duplicates(subset=["item_id"])
 item_to_meta = meta.set_index("item_id").to_dict(orient="index")
+
+# item_to_meta = meta.set_index("item_id").to_dict(orient="index")
 
 app = FastAPI(title="Retail Forecasting (no-lag)")
 
@@ -90,7 +94,7 @@ def predict(req: PredictionRequest):
         raw_df = pd.DataFrame([req.features])
         X = preprocess_input(raw_df)
         preds = model.predict(X)
-        return {"prediction": float(preds[0])}
+        return {"prediction": round(preds[0])}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

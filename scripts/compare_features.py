@@ -15,7 +15,7 @@ payload = {
     }
 }
 
-resp = requests.post("http://127.0.0.1:8000/debug/preprocess", json=payload)
+resp = requests.post("http://127.0.0.1:8000/predict", json=payload)
 resp.raise_for_status()
 data = resp.json()
 pre_cols = data["columns"]
