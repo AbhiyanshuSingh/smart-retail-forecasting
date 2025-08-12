@@ -37,8 +37,8 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner | lowercase }}/smart-retail-forecasting:latest
+          tags: ghcr.io/abhiyanshusingh/smart-retail-forecasting:latest
 
       - name: Print pushed image reference
         run: |
-          echo "Pushed: ghcr.io/${{ github.repository_owner }}/smart-retail-forecasting:latest"
+          echo "Pushed: ghcr.io/abhiyanshusingh/smart-retail-forecasting:latest"
