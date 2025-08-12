@@ -38,8 +38,6 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/smart-retail-forecasting:latest
-          # optionally set platforms if you need multi-arch:
-          # platforms: linux/amd64
 
       - name: Print pushed image reference
         run: echo "Pushed: ghcr.io/${{ github.repository_owner }}/smart-retail-forecasting:latest"
