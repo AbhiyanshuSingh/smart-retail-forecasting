@@ -40,4 +40,5 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/smart-retail-forecasting:latest
 
       - name: Print pushed image reference
-        run: echo "Pushed: ghcr.io/${{ github.repository_owner }}/smart-retail-forecasting:latest"
+        run: |
+          echo "Pushed: ghcr.io/${{ github.repository_owner }}/smart-retail-forecasting:latest"
