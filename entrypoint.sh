@@ -9,14 +9,14 @@ mkdir -p /app/data/raw /app/data/processed
 # If SAS URLs are provided, download recursively
 if [[ -n "${RAW_SAS_URL:-}" ]]; then
   echo "[entrypoint] Downloading RAW data from SAS…"
-  azcopy cp "${RAW_SAS_URL}" "/app/data" --recursive
+  azcopy cp "${RAW_SAS_URL}/*" "/app/data/raw" --recursive
 else
   echo "[entrypoint] RAW_SAS_URL not set. Skipping RAW download."
 fi
 
 if [[ -n "${PROCESSED_SAS_URL:-}" ]]; then
   echo "[entrypoint] Downloading PROCESSED data from SAS…"
-  azcopy cp "${PROCESSED_SAS_URL}" "/app/data" --recursive
+  azcopy cp "${PROCESSED_SAS_URL}/*" "/app/data/processed" --recursive
 else
   echo "[entrypoint] PROCESSED_SAS_URL not set. Skipping PROCESSED download."
 fi
