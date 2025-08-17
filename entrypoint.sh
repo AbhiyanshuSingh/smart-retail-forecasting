@@ -52,18 +52,17 @@ download_zip () {
   fi
 
   echo "[entrypoint] Downloading $out …"
-  if [[ -n "${GITHUB_DATA_TOKEN:-}" ]]; then
-    # Private assets path (API). If you passed a browser_download_url, token still works via header.
-    curl -fSL -H "Authorization: Bearer ${GITHUB_DATA_TOKEN}" -o "$out" "$url"
-  else
-    # Public assets path
-    curl -fSL -o "$out" "$url"
-  fi
+  curl -fSL -o "$out" "$url"
 }
 
+# === Replace these with your actual GitHub Release URLs ===
+RAW_URL="https://github.com/AbhiyanshuSingh/smart-retail-forecasting/releases/download/data-17-08-2025/raw.zip"
+PROC_URL="https://github.com/AbhiyanshuSingh/smart-retail-forecasting/releases/download/data-17-08-2025/processed.zip"
+# ==========================================================
+
 # Download
-download_zip "${DATA_RELEASE_RAW_URL:-}"       "/tmp/raw.zip"
-download_zip "${DATA_RELEASE_PROCESSED_URL:-}" "/tmp/processed.zip"
+download_zip "$RAW_URL"  "/tmp/raw.zip"
+download_zip "$PROC_URL" "/tmp/processed.zip"
 
 # Unzip
 if [[ -f /tmp/raw.zip ]]; then
@@ -92,7 +91,7 @@ fi
 echo "[entrypoint] Data layout after download:"
 ls -lahR /app/data || true
 
-# Sanity checks (fail fast with a clear message if files are missing)
+# Sanity checks
 RAW_OK=0
 [[ -f /app/data/raw/calendar.csv ]] && RAW_OK=1 || echo "[entrypoint] WARNING: /app/data/raw/calendar.csv not found"
 PROC_OK=0
@@ -105,3 +104,4 @@ fi
 
 echo "[entrypoint] Launching Uvicorn on 0.0.0.0:${PORT:-8000}…"
 exec uvicorn "${APP_MODULE:-app_nolag:app}" --host 0.0.0.0 --port "${PORT:-8000}"
+
