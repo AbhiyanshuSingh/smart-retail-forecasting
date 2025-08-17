@@ -6,7 +6,10 @@ import pandas as pd
 from pathlib import Path
 
 MODELS = Path("models")
-DATA_RAW = Path("data/raw")
+BASE_DIR = Path(__file__).resolve().parent
+# DATA_RAW = Path("data/raw")
+DATA_RAW = BASE_DIR / "data" / "raw"
+DATA_PROCESSED = BASE_DIR / "data" / "processed"
 
 # Load model + artifacts
 model = joblib.load(MODELS / "baseline_lightgbm_nolag.joblib")
@@ -21,7 +24,8 @@ sell_prices = pd.read_csv(DATA_RAW / "sell_prices.csv")  # has store_id,item_id,
 
 # create item->meta lookup from original processed dataset if needed
 # we assume train_features.parquet has columns item_id, dept_id, cat_id, state_id
-meta = pd.read_parquet("data/processed/train_features.parquet")[["item_id","dept_id","cat_id","store_id","state_id"]].drop_duplicates()
+# meta = pd.read_parquet("data/processed/train_features.parquet")[["item_id","dept_id","cat_id","store_id","state_id"]].drop_duplicates()
+meta = pd.read_parquet(DATA_PROCESSED / "train_features.parquet")[["item_id","dept_id","cat_id","store_id","state_id"]].drop_duplicates()
 
 meta = meta.drop_duplicates(subset=["item_id"])
 item_to_meta = meta.set_index("item_id").to_dict(orient="index")
