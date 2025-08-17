@@ -58,9 +58,13 @@
 
 FROM python:3.10-slim
 
-# System deps for downloading & unzipping
-RUN apt-get update && apt-get install -y --no-install-recommends curl unzip && \
-    rm -rf /var/lib/apt/lists/*
+# Install system dependencies (add libgomp1 for LightGBM)
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libgomp1 \
+    curl \
+    unzip \
+ && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -71,7 +75,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy app code (exclude local data)
 COPY . .
 
-# Use the entrypoint that downloads data from GitHub Releases
+# Make entrypoint executable
+RUN chmod +x /app/entrypoint.sh
+
+# # Use the entrypoint that downloads data from GitHub Releases
 ENV APP_MODULE=app_nolag:app
 EXPOSE 8000
-CMD ["/bin/bash", "/app/entrypoint.sh"]
+# CMD ["/bin/bash", "/app/entrypoint.sh"]
+
+# Run entrypoint
+CMD ["/app/entrypoint.sh"]
