@@ -75,6 +75,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy app code (exclude local data)
 COPY . .
 
+COPY data ./data
+
 # Make entrypoint executable
 RUN chmod +x /app/entrypoint.sh
 
