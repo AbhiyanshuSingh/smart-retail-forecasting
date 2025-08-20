@@ -5,11 +5,22 @@ echo "[entrypoint] Starting container with bundled data…"
 
 # Sanity checks
 RAW_OK=0
-[[ -f /app/data/raw/calendar.csv ]] && RAW_OK=1 || echo "[entrypoint] WARNING: /app/data/raw/calendar.csv not found"
-PROC_OK=0
-[[ -f /app/data/processed/train_features.parquet ]] && PROC_OK=1 || echo "[entrypoint] WARNING: /app/data/processed/train_features.parquet not found"
+# [[ -f /app/data/raw/calendar.csv ]] && RAW_OK=1 || echo "[entrypoint] WARNING: /app/data/raw/calendar.csv not found"
+if [ -f /app/data/raw/calendar.csv ]; then
+  RAW_OK=1
+else
+  echo "[entrypoint] WARNING: /app/data/raw/calendar.csv not found"
+fi
 
-if [[ "$RAW_OK" -ne 1 || "$PROC_OK" -ne 1 ]]; then
+PROC_OK=0
+# [[ -f /app/data/processed/train_features.parquet ]] && PROC_OK=1 || echo "[entrypoint] WARNING: /app/data/processed/train_features.parquet not found"
+if [ -f /app/data/processed/train_features.parquet ]; then
+  PROC_OK=1
+else
+  echo "[entrypoint] WARNING: /app/data/processed/train_features.parquet not found"
+fi
+
+if [ "$RAW_OK" -ne 1 ] || ["$PROC_OK" -ne 1 ]; then
   echo "[entrypoint] ERROR: Required files missing in image. Did you COPY them in Dockerfile?"
   exit 1
 fi
