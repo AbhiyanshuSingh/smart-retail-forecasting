@@ -126,5 +126,5 @@ if [[ "$RAW_OK" -ne 1 || "$PROC_OK" -ne 1 ]]; then
   exit 1
 fi
 
-echo "[entrypoint] Launching Uvicorn on 0.0.0.0:${PORT:-8000}…"
-exec uvicorn "${APP_MODULE:-app_nolag:app}" --host 0.0.0.0 --port "${PORT:-8000}"
+echo "[entrypoint] Launching Uvicorn on 0.0.0.0:${PORT:-8080}…"
+exec uvicorn "${APP_MODULE:-app_nolag:app}" --host 0.0.0.0 --port "${PORT:-8080}"
