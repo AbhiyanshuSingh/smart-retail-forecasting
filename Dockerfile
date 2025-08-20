@@ -82,7 +82,7 @@ RUN chmod +x /app/entrypoint.sh
 
 # # Use the entrypoint that downloads data from GitHub Releases
 ENV APP_MODULE=app_nolag:app
-EXPOSE 8000
+EXPOSE 8080
 # CMD ["/bin/bash", "/app/entrypoint.sh"]
 
 # Run entrypoint
