@@ -1,4 +1,6 @@
 # app.py (or app_nolag.py)
+from bootstrap_data import ensure_data
+ensure_data()  # download data if missing
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import joblib, json
@@ -7,7 +9,8 @@ from pathlib import Path
 
 MODELS = Path("models")
 # BASE_DIR = Path(__file__).resolve().parent
-DATA_RAW = Path("data/raw")
+DATA_RAW = Path(__file__).resolve().parent / "data" / "raw"
+DATA_PROCESSED = Path(__file__).resolve().parent / "data" / "processed"
 # DATA_RAW = BASE_DIR / "data" / "raw"
 # DATA_PROCESSED = BASE_DIR / "data" / "processed"
 
@@ -24,8 +27,8 @@ sell_prices = pd.read_csv(DATA_RAW / "sell_prices.csv")  # has store_id,item_id,
 
 # create item->meta lookup from original processed dataset if needed
 # we assume train_features.parquet has columns item_id, dept_id, cat_id, state_id
-meta = pd.read_parquet("data/processed/train_features.parquet")[["item_id","dept_id","cat_id","store_id","state_id"]].drop_duplicates()
-# meta = pd.read_parquet(DATA_PROCESSED / "train_features.parquet")[["item_id","dept_id","cat_id","store_id","state_id"]].drop_duplicates()
+# meta = pd.read_parquet("data/processed/train_features.parquet")[["item_id","dept_id","cat_id","store_id","state_id"]].drop_duplicates()
+meta = pd.read_parquet(DATA_PROCESSED / "train_features.parquet")[["item_id","dept_id","cat_id","store_id","state_id"]].drop_duplicates()
 
 meta = meta.drop_duplicates(subset=["item_id"])
 item_to_meta = meta.set_index("item_id").to_dict(orient="index")

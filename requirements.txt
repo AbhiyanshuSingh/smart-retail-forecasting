@@ -11,3 +11,5 @@ pyarrow
 streamlit
 matplotlib
 pytest
+azure-identity>=1.16.0
+azure-storage-blob>=12.20.0
