@@ -7,7 +7,8 @@ from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 
 def _blob_service_client() -> BlobServiceClient:
-    account_url = os.environ["https://smartretailforecasting.blob.core.windows.net/smart-retail-forecasting"]  # e.g., https://acct.blob.core.windows.net
+    #account_url = os.environ["https://smartretailforecasting.blob.core.windows.net/smart-retail-forecasting"]  # e.g., https://acct.blob.core.windows.net
+    account_url = os.environ["STORAGE_ACCOUNT_URL"]  # e.g., https://acct.blob.core.windows.net
     # Prefer Managed Identity; DefaultAzureCredential will use it in App Service
     cred = DefaultAzureCredential(exclude_interactive_browser_credential=True)
     return BlobServiceClient(account_url=account_url, credential=cred)
@@ -35,7 +36,7 @@ def ensure_data():
     Download raw/ and processed/ prefixes to ./data if the key files are missing.
     Safe to call multiple times; quick if files already exist.
     """
-    container = os.environ.get("BLOB_CONTAINER_NAME", "retaildata")
+    container = os.environ.get("BLOB_CONTAINER_NAME", "smart-retail-forecasting")
     prefixes_env = os.environ.get("BLOB_PREFIXES", "raw/,processed/")
     prefixes: Iterable[str] = [p.strip() for p in prefixes_env.split(",") if p.strip()]
 
