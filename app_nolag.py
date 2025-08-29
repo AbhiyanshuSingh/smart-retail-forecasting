@@ -7,6 +7,8 @@ import joblib, json
 import pandas as pd
 from pathlib import Path
 
+app = FastAPI(title="Retail Forecasting (no-lag)")
+
 MODELS = Path("models")
 # BASE_DIR = Path(__file__).resolve().parent
 DATA_RAW = Path(__file__).resolve().parent / "data" / "raw"
@@ -14,28 +16,52 @@ DATA_PROCESSED = Path(__file__).resolve().parent / "data" / "processed"
 # DATA_RAW = BASE_DIR / "data" / "raw"
 # DATA_PROCESSED = BASE_DIR / "data" / "processed"
 
-# Load model + artifacts
-model = joblib.load(MODELS / "baseline_lightgbm_nolag.joblib")
-with open(MODELS / "feature_columns_nolag.json", "r", encoding="utf-8") as f:
-    TRAIN_COLS = json.load(f)
-with open(MODELS / "cat_mappings_nolag.json", "r", encoding="utf-8") as f:
-    CAT_MAPS = json.load(f)
+# # Load model + artifacts
+# model = joblib.load(MODELS / "baseline_lightgbm_nolag.joblib")
+# with open(MODELS / "feature_columns_nolag.json", "r", encoding="utf-8") as f:
+#     TRAIN_COLS = json.load(f)
+# with open(MODELS / "cat_mappings_nolag.json", "r", encoding="utf-8") as f:
+#     CAT_MAPS = json.load(f)
 
-# Preload lookups
-calendar = pd.read_csv(DATA_RAW / "calendar.csv")  # has date, wm_yr_wk, event_name_1, ...
-sell_prices = pd.read_csv(DATA_RAW / "sell_prices.csv")  # has store_id,item_id,wm_yr_wk,sell_price
+# # Preload lookups
+# calendar = pd.read_csv(DATA_RAW / "calendar.csv")  # has date, wm_yr_wk, event_name_1, ...
+# sell_prices = pd.read_csv(DATA_RAW / "sell_prices.csv")  # has store_id,item_id,wm_yr_wk,sell_price
 
-# create item->meta lookup from original processed dataset if needed
-# we assume train_features.parquet has columns item_id, dept_id, cat_id, state_id
-# meta = pd.read_parquet("data/processed/train_features.parquet")[["item_id","dept_id","cat_id","store_id","state_id"]].drop_duplicates()
-meta = pd.read_parquet(DATA_PROCESSED / "train_features.parquet")[["item_id","dept_id","cat_id","store_id","state_id"]].drop_duplicates()
+# # create item->meta lookup from original processed dataset if needed
+# # we assume train_features.parquet has columns item_id, dept_id, cat_id, state_id
+# # meta = pd.read_parquet("data/processed/train_features.parquet")[["item_id","dept_id","cat_id","store_id","state_id"]].drop_duplicates()
+# meta = pd.read_parquet(DATA_PROCESSED / "train_features.parquet")[["item_id","dept_id","cat_id","store_id","state_id"]].drop_duplicates()
 
-meta = meta.drop_duplicates(subset=["item_id"])
-item_to_meta = meta.set_index("item_id").to_dict(orient="index")
-
+# meta = meta.drop_duplicates(subset=["item_id"])
 # item_to_meta = meta.set_index("item_id").to_dict(orient="index")
 
-app = FastAPI(title="Retail Forecasting (no-lag)")
+# # item_to_meta = meta.set_index("item_id").to_dict(orient="index")
+
+
+@app.on_event("startup")
+async def load_resources():
+    global model, TRAIN_COLS, CAT_MAPS, calendar, sell_prices, item_to_meta
+
+    print("[startup] Loading models and data...")
+
+    # Load model + artifacts
+    model = joblib.load(MODELS / "baseline_lightgbm_nolag.joblib")
+    with open(MODELS / "feature_columns_nolag.json", "r", encoding="utf-8") as f:
+        TRAIN_COLS = json.load(f)
+    with open(MODELS / "cat_mappings_nolag.json", "r", encoding="utf-8") as f:
+        CAT_MAPS = json.load(f)
+
+    # Load datasets
+    calendar = pd.read_csv(DATA_RAW / "calendar.csv")
+    sell_prices = pd.read_csv(DATA_RAW / "sell_prices.csv")
+
+    meta = pd.read_parquet(DATA_PROCESSED / "train_features.parquet")[
+        ["item_id", "dept_id", "cat_id", "store_id", "state_id"]
+    ].drop_duplicates()
+    item_to_meta = meta.set_index("item_id").to_dict(orient="index")
+
+    print("[startup] Data and model loaded successfully!")
+
 
 class PredictionRequest(BaseModel):
     features: dict  # minimal input: {"store_id":"CA_1","item_id":"FOODS_1_001","date":"2016-05-01"}
