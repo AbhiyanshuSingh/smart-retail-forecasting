@@ -9,6 +9,14 @@ from pathlib import Path
 
 app = FastAPI(title="Retail Forecasting (no-lag)")
 
+# Global variables (lazy-loaded at startup)
+model = None
+TRAIN_COLS = None
+CAT_MAPS = None
+calendar = None
+sell_prices = None
+item_to_meta = None
+
 MODELS = Path("models")
 # BASE_DIR = Path(__file__).resolve().parent
 DATA_RAW = Path(__file__).resolve().parent / "data" / "raw"
