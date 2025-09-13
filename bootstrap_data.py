@@ -69,7 +69,7 @@ def _blob_service_client() -> BlobServiceClient:
     1. Managed Identity / DefaultAzureCredential (preferred in Azure), or
     2. SAS token from STORAGE_SAS_TOKEN (fallback for local/testing).
     """
-    account_url = os.environ["https://retailforecastingstorage.blob.core.windows.net"]  # e.g., https://acct.blob.core.windows.net
+    account_url = os.environ["https://retailforecastingstorage.blob.core.windows.net/"]  # e.g., https://acct.blob.core.windows.net
     sas_token = os.environ.get("sv=2024-11-04&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2025-09-29T21:15:12Z&st=2025-09-13T13:00:12Z&spr=https&sig=G8skFAVcFlWQNpE7ztrZVHzm1reZLgD%2Fixtv9ykLDBw%3D")
 
     if sas_token:
