@@ -90,6 +90,10 @@ def _mirror_prefix(container_name: str, prefix: str, dest_root: Path) -> None:
     bsc = _blob_service_client()
     container = bsc.get_container_client(container_name)
     for blob in container.list_blobs(name_starts_with=prefix):
+        # FIX: remove the leading "data/" from blob path if present
+        rel_path = Path(blob.name)
+        if rel_path.parts[0] == "data":
+            rel_path = Path(*rel_path.parts[1:])
         target = dest_root / Path(blob.name)
         target.parent.mkdir(parents=True, exist_ok=True)
         if not target.exists():
